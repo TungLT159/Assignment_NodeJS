@@ -40,7 +40,7 @@ const fileStorage = multer.diskStorage({
     })
     //Loc ra loai file anh 
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg' || file.mimetype === 'image/HEIC') {
         cb(null, true)
     } else {
         cb(null, false)
