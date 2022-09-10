@@ -36,7 +36,10 @@
                             <div class="form-group mb-3">
                                 <label for="exampleFormControlInput1">Chọn Ảnh:</label>
                                 <input type="file" class="form-control" name="image">
-                              </div>
+                            </div>
+                            <% if (errMessage) { %>
+                              <div id="emailHelp" class="form-text text-danger mb-3"><%= errorMessage %></div>
+                            <% } %>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <button type="submit" class="btn btn-primary">Lưu Ảnh</button>

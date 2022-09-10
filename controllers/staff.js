@@ -19,24 +19,35 @@ exports.getStaff = (req, res, next) => {
         path: '/staff',
         staff: req.staff,
         doB: `${req.staff.doB.getDate()}/${req.staff.doB.getMonth() + 1}/${req.staff.doB.getFullYear()}`,
-        startDate: `${req.staff.startDate.getDate()}/${req.staff.startDate.getMonth() + 1}/${req.staff.startDate.getFullYear()}`
+        startDate: `${req.staff.startDate.getDate()}/${req.staff.startDate.getMonth() + 1}/${req.staff.startDate.getFullYear()}`,
+        errMessage: null
     });
 };
 
 exports.getIndex = (req, res, next) => {
     res.render('viewStaff/index', {
-            pageTitle: 'Điểm Danh',
-            path: '/',
-            staff: req.staff,
-            isWork: req.staff.isWork,
-            totalHours: req.staff.totalHours,
-            messageErr: null
-        })
-        // res.send('hello')
+        pageTitle: 'Điểm Danh',
+        path: '/',
+        staff: req.staff,
+        isWork: req.staff.isWork,
+        totalHours: req.staff.totalHours,
+        messageErr: null
+    })
 };
 
 exports.postImage = (req, res, next) => {
     const image = req.file
+    if (!image) {
+        return res.status(422).render('viewStaff/staff-info', {
+            pageTitle: 'Thông Tin Nhân Viên',
+            path: '/staff',
+            staff: req.staff,
+            doB: `${req.staff.doB.getDate()}/${req.staff.doB.getMonth() + 1}/${req.staff.doB.getFullYear()}`,
+            startDate: `${req.staff.startDate.getDate()}/${req.staff.startDate.getMonth() + 1}/${req.staff.startDate.getFullYear()}`,
+            errMessage: 'Chỉ có thể lưu file ảnh'
+        });
+    }
+
     Staff
         .findById(req.staff._id)
         .then(staff => {
@@ -98,7 +109,11 @@ exports.getWork = (req, res, next) => {
                 lastPage: 30
             })
         })
-
+        .catch(err => {
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            return next(error)
+        })
 
 }
 
@@ -167,6 +182,11 @@ exports.postWork = (req, res, next) => {
                 prevPage: page - 1,
                 lastPage: 30
             })
+        })
+        .catch(err => {
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            return next(error)
         })
 }
 
@@ -483,7 +503,9 @@ exports.getCovidPdf = (req, res, next) => {
             pdfDoc.end()
         })
         .catch(err => {
-            console.log(err)
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            return next(error)
         })
 }
 
@@ -496,6 +518,11 @@ exports.getManager = (req, res, next) => {
                 path: '/manager',
                 staff: staff
             })
+        })
+        .catch(err => {
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            return next(error)
         })
 }
 
@@ -511,6 +538,11 @@ exports.getStaffManager = (req, res, next) => {
                 dataResult: null,
                 errMessage: null
             })
+        })
+        .catch(err => {
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            return next(error)
         })
 }
 
@@ -528,6 +560,11 @@ exports.postDelete = (req, res, next) => {
             console.log('Xoa thanh cong')
             res.redirect(`/manager/${staff._id}`)
         })
+        .catch(err => {
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            return next(error)
+        })
 }
 
 exports.postConfirm = (req, res, next) => {
@@ -541,7 +578,11 @@ exports.postConfirm = (req, res, next) => {
         .then(() => {
             res.redirect(`/manager/${staffId}`)
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            return next(error)
+        })
 }
 
 exports.postSelectMonth = (req, res, next) => {
@@ -578,5 +619,9 @@ exports.postSelectMonth = (req, res, next) => {
                 })
             }
         })
-
+        .catch(err => {
+            const error = new Error(err)
+            error.httpStatusCode = 500
+            return next(error)
+        })
 }
