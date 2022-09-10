@@ -2,59 +2,108 @@ const path = require('path');
 
 const express = require('express');
 const mongoose = require('mongoose');
+const multer = require('multer')
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const errorController = require('./controllers/error');
 const Staff = require('./models/staff')
+const MONGODB_URI = 'mongodb+srv://tunglt:dvalvuumm1ty1@cluster0.5hjpvkp.mongodb.net/staff2?retryWrites=true&w=majority'
+
+
 const app = express();
+const store = new MongoDBStore({
+    uri: MONGODB_URI,
+    collection: 'sessions'
+});
+
+const csrfProtection = csrf();
+
+
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const staffRoutes = require('./routes/staff');
+const authRoutes = require('./routes/auth');
+
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images')
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString() + '-' + file.originalname)
+    }
+})
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
+        cb(null, true)
+    } else {
+        cb(null, false)
+    }
+}
 
 app.use(express.urlencoded({ extended: false }));
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
+app.use(
+    session({
+        secret: 'my secret',
+        resave: false,
+        saveUninitialized: false,
+        store: store
+    })
+);
+app.use(csrfProtection);
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.isManager = req.session.isManager;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 //Luu staff vao req
 app.use((req, res, next) => {
-    Staff.findById("63121f26fccfb53d499124d7")
+    if (!req.session.staff) {
+        return next();
+    }
+    Staff.findById(req.session.staff._id)
         .then(staff => {
-            req.staff = staff
+            if (!staff) {
+                return next();
+            }
+            req.staff = staff;
             next();
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            next(new Error(err))
+        });
 });
 
 app.use(staffRoutes);
+app.use(authRoutes)
 
 app.use(errorController.get404);
+// app.get('/500', errorController.get500)
 
+// app.use((error, req, res, next) => {
+//     res.status(500).render('500', {
+//         pageTitle: 'Server error',
+//         path: '/500',
+//         isAuthenticated: req.session.isLoggedIn
+//     });
+// })
 
 mongoose
-    .connect('mongodb+srv://tunglt:dvalvuumm1ty1@cluster0.5hjpvkp.mongodb.net/staff?retryWrites=true&w=majority')
+    .connect(MONGODB_URI)
     .then(result => {
-        Staff.findOne().then(staff => {
-            if (!staff) {
-                //Neu chua co staff thi khoi tao 1 staff moi
-                const staff = new Staff({
-                    name: 'Nguyễn Văn A',
-                    doB: '1/1/2000',
-                    salaryScale: 1.1,
-                    startDate: '12/2/2019',
-                    department: 'IT',
-                    annualLeave: 4,
-                    imageUrl: 'https://www.seekpng.com/png/full/356-3562377_personal-user.png',
-                    sessionWork: [
-                        []
-                    ],
-                    isWork: false,
-                    totalHourWork: 0,
-                    onLeave: {},
-                    endDayWork: false
-                })
-                staff.save()
-            }
-        })
         app.listen(3000)
     })
     .catch(err => console.log(err))

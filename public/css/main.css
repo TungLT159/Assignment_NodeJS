@@ -10,6 +10,28 @@
     color: green;
 }
 
+.btn-logout {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+.link-staff {
+    border: 1px solid rgb(0, 74, 127);
+    border-radius: 3px;
+    padding: 2px 4px;
+    text-decoration: none;
+    color: rgb(0, 74, 127);
+    transition: all .3s
+}
+
+.link-staff:hover {
+    background: rgb(0, 74, 127);
+    color: white
+}
+
 
 /* .btn {
     display: inline-block;
@@ -40,11 +62,8 @@
     color: white;
 } */
 
-@media (min-width: 768px) {
-    .main-header__nav {
-        display: flex;
-    }
-    #side-menu-toggle {
-        display: none;
+@media (max-width: 768px) {
+    .sm-text {
+        font-size: 12px;
     }
 }

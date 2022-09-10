@@ -1,5 +1,4 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/product.css">
 </head>
 
 <body>
@@ -20,7 +19,7 @@
                         <form action="<% if (!isWork) { %>/start-work<% } else { %>/end-work<% } %>" method="post">
                             <div class="form-group">
                               <label for="exampleFormControlInput1">Tên nhân viên:</label>
-                              <input type="email" class="form-control" name="name" value="<%= staff.name %>" disabled>
+                              <input type="text" class="form-control" name="name" value="<%= staff.name %>" disabled>
                             </div>
                             <div class="form-group">
                               <label for="place">Nơi làm việc:</label>
@@ -30,6 +29,7 @@
                                 <option value="Khách hàng">Khách hàng</option>
                               </select>
                             </div>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <button class="btn btn-outline-primary mt-3" type="submit"><% if(!isWork) { %>Bắt đầu làm việc<% } else { %>Ngừng làm việc<% } %></button>
                           </form>
                     </div>
@@ -46,7 +46,11 @@
                 <div class="accordion-body">
                     <div class="form-checkout">
                         <div class="row">
-                          <p>Số giờ đã làm hôm nay: <%= staff.totalHours.toFixed(1) %>h</p>
+                          <% if(!staff.totalHours) { %>
+                            <p>Số giờ đã làm hôm nay: 0h</p>
+                          <% } else { %>
+                            <p>Số giờ đã làm hôm nay: <%= staff.totalHours.toFixed(1) %>h</p>
+                          <% } %>
                         </div>
                         <div class="row">
                             <p>Danh sách các lần làm việc trong ngày:</p>
@@ -60,6 +64,7 @@
                         </div>
                         <div>
                           <form action="/end-day-work" method="post">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <button type="submit" class="btn btn-outline-primary">Kết thúc ngày làm</button>
                           </form>
                         </div>
@@ -118,6 +123,7 @@
                     </div>
                     <% } else { %>
                       <div class="col-12">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <button type="submit" class="btn btn-outline-primary">Đăng ký</button>
                       </div>
                     <% } %>

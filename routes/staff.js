@@ -4,30 +4,43 @@ const express = require('express');
 
 const staffController = require('../controllers/staff');
 
+const isAuth = require('../middleware/is-auth')
+
 const router = express.Router();
 
-router.get('/', staffController.getIndex)
+router.get('/', isAuth, staffController.getIndex)
 
-router.get('/staff', staffController.getStaff)
+router.get('/staff', isAuth, staffController.getStaff)
 
-router.get('/work', staffController.getWork)
+router.get('/work', isAuth, staffController.getWork)
 
-router.get('/covid', staffController.getCovid)
+router.get('/covid', isAuth, staffController.getCovid)
 
-router.post('/covid', staffController.postCovid)
+router.get('/covid/:covidId', isAuth, staffController.getCovidPdf)
 
-router.post('/post-image', staffController.postImage)
+router.get('/manager', isAuth, staffController.getManager)
 
-router.post('/start-work', staffController.postWorking)
+router.get('/manager/:staffId', isAuth, staffController.getStaffManager)
 
-router.post('/end-work', staffController.postEndWorking)
+router.post('/covid', isAuth, staffController.postCovid)
 
-router.post('/end-day-work', staffController.postEndDayWork)
+router.post('/post-image', isAuth, staffController.postImage)
 
-router.post('/off-work', staffController.postOffWork)
+router.post('/start-work', isAuth, staffController.postWorking)
 
-router.post('/work', staffController.postWork)
+router.post('/end-work', isAuth, staffController.postEndWorking)
 
+router.post('/end-day-work', isAuth, staffController.postEndDayWork)
+
+router.post('/off-work', isAuth, staffController.postOffWork)
+
+router.post('/work', isAuth, staffController.postWork)
+
+router.post('/delete', isAuth, staffController.postDelete)
+
+router.post('/confirm', isAuth, staffController.postConfirm)
+
+router.post('/select-month', isAuth, staffController.postSelectMonth)
 
 
 module.exports = router;

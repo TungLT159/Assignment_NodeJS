@@ -42,8 +42,11 @@ const staffSchema = new Schema({
             type: Number
         }
     },
-    endDayWork: { type: Boolean, required: true },
-    totalHours: { type: Number, required: true },
+    email: { type: String, required: true },
+    password: { type: String, required: true },
+    isManager: { type: Boolean, required: true },
+    totalHours: { type: Number },
+    confirm: { type: Boolean },
     sessionWork: [
         [{
             timeStart: { type: Date },
@@ -53,7 +56,14 @@ const staffSchema = new Schema({
             placeWork: { type: String, required: true },
             totalHourWork: { type: Number },
             hourAnnualLeave: { type: Number },
-            overTime: { type: Number }
+            overTime: { type: Number },
+            dateStart: {
+                type: Date
+            },
+            dateEnd: {
+                type: Date
+            },
+            reason: { type: String }
         }]
     ]
 })

@@ -32,12 +32,13 @@
                         <h5 class="modal-title" id="exampleModalLabel">Đổi ảnh đại diện</h5>
                         </div>
                         <div class="modal-body">
-                        <form action="/post-image" method="post">
+                        <form action="/post-image" method="post" enctype="multipart/form-data">
                             <div class="form-group mb-3">
-                                <label for="exampleFormControlInput1">Url Ảnh:</label>
-                                <input type="text" class="form-control" name="imageUrl" placeholder="Nhập link ảnh" >
+                                <label for="exampleFormControlInput1">Chọn Ảnh:</label>
+                                <input type="file" class="form-control" name="image">
                               </div>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <button type="submit" class="btn btn-primary">Lưu Ảnh</button>
                         </form>
                         </div>
