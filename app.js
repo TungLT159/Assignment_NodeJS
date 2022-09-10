@@ -14,6 +14,7 @@ const MONGODB_URI = 'mongodb+srv://tunglt:dvalvuumm1ty1@cluster0.5hjpvkp.mongodb
 
 
 const app = express();
+//Luu session vao mongodb
 const store = new MongoDBStore({
     uri: MONGODB_URI,
     collection: 'sessions'
@@ -30,14 +31,14 @@ const staffRoutes = require('./routes/staff');
 const authRoutes = require('./routes/auth');
 
 const fileStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'images')
-    },
-    filename: (req, file, cb) => {
-        cb(null, new Date().toISOString() + '-' + file.originalname)
-    }
-})
-
+        destination: (req, file, cb) => {
+            cb(null, 'images')
+        },
+        filename: (req, file, cb) => {
+            cb(null, new Date().toISOString() + '-' + file.originalname)
+        }
+    })
+    //Loc ra loai file anh 
 const fileFilter = (req, file, cb) => {
     if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
         cb(null, true)
@@ -61,7 +62,7 @@ app.use(
 );
 app.use(csrfProtection);
 app.use(flash());
-
+//Luu thong tin session vao token
 app.use((req, res, next) => {
     res.locals.isAuthenticated = req.session.isLoggedIn;
     res.locals.isManager = req.session.isManager;
@@ -92,7 +93,7 @@ app.use(authRoutes)
 
 app.use(errorController.get404);
 app.get('/500', errorController.get500)
-
+    //Xu ly loi
 app.use((error, req, res, next) => {
     res.status(500).render('500', {
         pageTitle: 'Server error',
@@ -109,3 +110,9 @@ mongoose
         })
     })
     .catch(err => console.log(err))
+    // mongoose
+    //     .connect(MONGODB_URI)
+    //     .then(result => {
+    //         app.listen(3000)
+    //     })
+    //     .catch(err => console.log(err))

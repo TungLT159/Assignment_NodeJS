@@ -63,13 +63,15 @@ exports.getWork = (req, res, next) => {
         .findById(req.staff._id)
         .then(staff => {
             totalItems = staff.sessionWork.reduce((acc, item) => {
-                return acc + item.length
-            }, 0)
+                    return acc + item.length
+                }, 0)
+                //Chuyen tat ca object vao mang moi
             staff.sessionWork.forEach(item => {
-                item.forEach(i => {
-                    return dataSession.push(i)
+                    item.forEach(i => {
+                        return dataSession.push(i)
+                    })
                 })
-            })
+                //Loc ra object co ngay bang page da chon
             const dataInPage = dataSession.filter(item => {
                 return item.timeStart.getDate() == page
             })
@@ -280,6 +282,9 @@ exports.postWorking = (req, res, next) => {
                 staff.sessionWork[staff.sessionWork.length - 1].push(itemSection)
                 return staff.save()
             }
+            if (itemSection.timeStart.getMonth() != staff.sessionWork[staff.sessionWork.length - 1][0].timeStart.getMonth()) {
+                staff.confirm = false
+            }
             //Neu ngay thay doi thi push mang moi vao sessionWork
             if (itemSection.timeStart.getDate() != staff.sessionWork[staff.sessionWork.length - 1][0].timeStart.getDate()) {
                 //Reset tong gio lam va lich off khi chuyen sang ngay moi
@@ -446,7 +451,9 @@ exports.getCovidPdf = (req, res, next) => {
             if (covid.staff.staffId.toString() !== req.staff._id.toString()) {
                 return next(new Error('Không hợp lệ'))
             }
+            //Dat ten file
             const covidFileName = 'covidInfo_' + covidId + '.pdf'
+                //Dat duong dan
             const covidFilePath = path.join('data', 'covidData', covidFileName)
             const pdfDoc = new PDFDocument()
             res.setHeader('Content-Type', 'application/pdf')
@@ -503,7 +510,7 @@ exports.getStaffManager = (req, res, next) => {
                 pageTitle: `Thông tin giờ làm ${staff.name}`,
                 path: `/manager/${staffId}`,
                 staff: staff,
-                data: null,
+                dataResult: null,
                 errMessage: null
             })
         })
@@ -529,6 +536,7 @@ exports.postConfirm = (req, res, next) => {
     const staffId = req.body.staffId
     Staff.findById(staffId)
         .then((staff) => {
+            //Chuyen trang thai xac nhan gio lam
             staff.confirm = true
             staff.save()
         })
@@ -544,17 +552,13 @@ exports.postSelectMonth = (req, res, next) => {
     let data = []
     Staff.findById(staffId)
         .then(staff => {
-            // staff.sessionWork.forEach(item => {
-            //     // console.log(item)
-            //     return data = item.filter(i => {
-            //         return i.timeStart.getMonth() + 1 == selectMonth || i.timeEnd.getMonth() + 1 == selectMonth
-            //     })
-            // })
+            //Chuyen tat ca object vao mang moi
             staff.sessionWork.forEach(item => {
-                item.forEach(i => {
-                    return data.push(i)
+                    item.forEach(i => {
+                        return data.push(i)
+                    })
                 })
-            })
+                //Loc ra object co thang bang thang da chon
             const dataResult = data.filter(i => {
                 return i.timeStart.getMonth() + 1 == selectMonth
             })
@@ -571,7 +575,7 @@ exports.postSelectMonth = (req, res, next) => {
                     pageTitle: `Thông tin giờ làm ${staff.name}`,
                     path: `/manager/${staffId}`,
                     staff: staff,
-                    dataResult: dataResult,
+                    dataResult: null,
                     errMessage: 'Chưa có dữ liệu của tháng này'
                 })
             }
