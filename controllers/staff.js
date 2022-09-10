@@ -75,7 +75,6 @@ exports.getWork = (req, res, next) => {
             const dataInPage = dataSession.filter(item => {
                 return item.timeStart.getDate() == page
             })
-            console.log('data', dataInPage)
             return dataInPage
 
         })
@@ -145,7 +144,6 @@ exports.postWork = (req, res, next) => {
                 console.log(item.timeStart.getDate())
                 return item.timeStart.getDate() == page
             })
-            console.log('data', dataInPage)
             return dataInPage
 
         })
