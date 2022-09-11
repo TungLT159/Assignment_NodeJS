@@ -51,8 +51,11 @@ exports.postImage = (req, res, next) => {
     Staff
         .findById(req.staff._id)
         .then(staff => {
+            //Check path da ton tai hay chua neu co thi xoa path cu
+            if (fs.existsSync(staff.imageUrl)) {
+                fileHelper.deleteFile(staff.imageUrl)
+            }
             //Cap nhat url anh
-            fileHelper.deleteFile(staff.imageUrl)
             staff.imageUrl = image.path
             return staff.save()
         })
@@ -64,6 +67,7 @@ exports.postImage = (req, res, next) => {
             error.httpStatusCode = 500
             return next(error)
         })
+        // .catch(err => console.log(err))
 }
 
 exports.getWork = (req, res, next) => {
