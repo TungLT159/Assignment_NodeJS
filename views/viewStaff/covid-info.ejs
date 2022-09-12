@@ -65,8 +65,8 @@
                 </div>
             </div>
         </div>
-        <h2>Xem thông tin Covid của nhân viên</h2>
         <% if (isManager) { %>
+            <h2>Xem thông tin Covid của nhân viên</h2>
             <ul class="list-group">
                 <li class="list-group-item"><%= staffs.name %> - <a class="link-staff" href="/covid-manager/<%= staffs._id %>">Xem thông tin</a></li>
             </ul>
