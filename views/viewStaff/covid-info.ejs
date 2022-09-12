@@ -59,11 +59,17 @@
                                 <p class="card-text">Ngày bị nhiễm <i class="fa-regular fa-calendar-days"></i>: <%= dateInfection %></p>
                                 <p class="card-text">Những nơi đã đi đến <i class="fa-solid fa-map-location-dot"></i>: <%= covid.place %></p>
                             <% } %>
-                            <a class="btn btn-outline-primary"href="/covid/<%= covid._id%>">Xuất thông tin</a>
+                            <a class="btn btn-outline-primary" href="/covid/<%= covid._id%>">Xuất thông tin</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <h2>Xem thông tin Covid của nhân viên</h2>
+        <% if (isManager) { %>
+            <ul class="list-group">
+                <li class="list-group-item"><%= staffs.name %> - <a class="link-staff" href="/covid-manager/<%= staffs._id %>">Xem thông tin</a></li>
+            </ul>
+        <% } %>
     </main>
 <%- include('../includes/end.ejs') %>

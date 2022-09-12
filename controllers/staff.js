@@ -8,9 +8,14 @@ const PDFDocument = require('pdfkit')
 
 const ITEM_PER_PAGE = 5
 let manager
+let staffs
 Staff.findOne({ isManager: true })
     .then(staff => {
         manager = staff
+    })
+Staff.findOne({ isManager: false })
+    .then(staff => {
+        staffs = staff
     })
 
 exports.getStaff = (req, res, next) => {
@@ -202,7 +207,8 @@ exports.getCovid = (req, res, next) => {
                     pageTitle: 'Thông tin covid',
                     path: '/covid',
                     staff: req.staff,
-                    covid: ''
+                    covid: '',
+                    staffs: staffs
                 })
             }
             const covid = covidData[0]
@@ -217,6 +223,7 @@ exports.getCovid = (req, res, next) => {
                 path: '/covid',
                 staff: req.staff,
                 covid: covid,
+                staffs: staffs,
                 dateVaccine1: `${covid.dateVaccine1.getDate()}/${covid.dateVaccine1.getMonth() + 1}/${covid.dateVaccine1.getFullYear()}`,
                 dateVaccine2: `${covid.dateVaccine2.getDate()}/${covid.dateVaccine2.getMonth() + 1}/${covid.dateVaccine2.getFullYear()}`,
                 dateTemp: `${covid.dateTemp.getHours()}h${covid.dateTemp.getMinutes()} - ${covid.dateTemp.getDate()}/${covid.dateTemp.getMonth() + 1}/${covid.dateVaccine2.getFullYear()}`,
@@ -470,10 +477,10 @@ exports.getCovidPdf = (req, res, next) => {
         .findById(covidId)
         .then(covid => {
             if (!covid) return next(new Error('Không tìm thấy thông tin Covid'))
-            if (covid.staff.staffId.toString() !== req.staff._id.toString()) {
-                return next(new Error('Không hợp lệ'))
-            }
-            //Dat ten file
+                // if (covid.staff.staffId.toString() !== req.staff._id.toString()) {
+                //     return next(new Error('Không hợp lệ'))
+                // }
+                //Dat ten file
             const covidFileName = 'covidInfo_' + covidId + '.pdf'
                 //Dat duong dan
             const covidFilePath = path.join('data', 'covidData', covidFileName)
@@ -555,6 +562,7 @@ exports.postDelete = (req, res, next) => {
     Staff.findOne({ isManager: false })
         .then(staff => {
             staff.sessionWork.forEach((items, index) => {
+                //Lay ra array moi co id khac voi id muon xoa
                 const newItem = items.filter(i => i._id.toString() !== sessionWorkId.toString())
                 staff.sessionWork[index] = newItem
             })
@@ -627,5 +635,40 @@ exports.postSelectMonth = (req, res, next) => {
             const error = new Error(err)
             error.httpStatusCode = 500
             return next(error)
+        })
+}
+
+exports.getCovidManager = (req, res, next) => {
+    const staffId = req.params.staffId
+    console.log(staffId)
+    Covid.find({ 'staff.staffId': staffId })
+        .then((covidData) => {
+            if (covidData.length == 0) {
+                return res.render('viewStaff/covidManager', {
+                    pageTitle: 'Thông tin covid',
+                    path: '/covid',
+                    staff: req.staff,
+                    covid: '',
+                    staffs: staffs
+                })
+            }
+            const covid = covidData[0]
+            let dateInfection = ''
+            if (covid.dateInfection == undefined) {
+                dateInfection = 'Chưa cập nhật'
+            } else {
+                dateInfection = `${covid.dateInfection.getDate()}/${covid.dateInfection.getMonth() + 1}/${covid.dateInfection.getFullYear()}`
+            }
+            return res.render('viewStaff/covidManager', {
+                pageTitle: 'Thông tin covid',
+                path: '/covid',
+                staff: req.staff,
+                covid: covid,
+                staffs: staffs,
+                dateVaccine1: `${covid.dateVaccine1.getDate()}/${covid.dateVaccine1.getMonth() + 1}/${covid.dateVaccine1.getFullYear()}`,
+                dateVaccine2: `${covid.dateVaccine2.getDate()}/${covid.dateVaccine2.getMonth() + 1}/${covid.dateVaccine2.getFullYear()}`,
+                dateTemp: `${covid.dateTemp.getHours()}h${covid.dateTemp.getMinutes()} - ${covid.dateTemp.getDate()}/${covid.dateTemp.getMonth() + 1}/${covid.dateVaccine2.getFullYear()}`,
+                dateInfection: dateInfection
+            })
         })
 }

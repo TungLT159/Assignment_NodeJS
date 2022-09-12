@@ -22,6 +22,8 @@ router.get('/manager', isAuth, staffController.getManager)
 
 router.get('/manager/:staffId', isAuth, staffController.getStaffManager)
 
+router.get('/covid-manager/:staffId', isAuth, staffController.getCovidManager)
+
 router.post('/covid', isAuth, staffController.postCovid)
 
 router.post('/post-image', isAuth, staffController.postImage)
@@ -42,5 +44,6 @@ router.post('/confirm', isAuth, staffController.postConfirm)
 
 router.post('/select-month', isAuth, staffController.postSelectMonth)
 
+// router.post('/covid-manager', isAuth, staffController.postCovidManager)
 
 module.exports = router;
