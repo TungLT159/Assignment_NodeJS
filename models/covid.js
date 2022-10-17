@@ -34,8 +34,8 @@ const covidSchema = new Schema({
         name: { type: String, required: true },
         staffId: {
             type: Schema.Types.ObjectId,
-            required: true,
-            ref: 'Staff'
+            ref: 'Staff',
+            required: true
         }
     }
 })

@@ -1,63 +1,67 @@
-const path = require('path');
+const path = require("path");
 
-const express = require('express');
-const mongoose = require('mongoose');
-const multer = require('multer')
-const session = require('express-session');
-const MongoDBStore = require('connect-mongodb-session')(session);
-const csrf = require('csurf');
-const flash = require('connect-flash');
+const express = require("express");
+const mongoose = require("mongoose");
+const multer = require("multer");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
+const csrf = require("csurf");
+const flash = require("connect-flash");
 
-const errorController = require('./controllers/error');
-const Staff = require('./models/staff')
-const MONGODB_URI = 'mongodb+srv://tunglt:dvalvuumm1ty1@cluster0.5hjpvkp.mongodb.net/staff2?retryWrites=true&w=majority'
-
+const errorController = require("./controllers/error");
+const Staff = require("./models/staff");
+const MONGODB_URI =
+    "mongodb+srv://tunglt:dvalvuumm1ty1@cluster0.5hjpvkp.mongodb.net/staff2?retryWrites=true&w=majority";
 
 const app = express();
 //Luu session vao mongodb
 const store = new MongoDBStore({
     uri: MONGODB_URI,
-    collection: 'sessions'
+    collection: "sessions",
 });
 
 const csrfProtection = csrf();
 
+app.set("view engine", "ejs");
+app.set("views", "views");
 
-
-app.set('view engine', 'ejs');
-app.set('views', 'views');
-
-const staffRoutes = require('./routes/staff');
-const authRoutes = require('./routes/auth');
+const staffRoutes = require("./routes/staff");
+const authRoutes = require("./routes/auth");
 
 const fileStorage = multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, 'images')
-        },
-        filename: (req, file, cb) => {
-            cb(null, new Date().toISOString() + '-' + file.originalname)
-        }
-    })
-    //Loc ra loai file anh 
+    destination: (req, file, cb) => {
+        cb(null, "images");
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString() + "-" + file.originalname);
+    },
+});
+//Loc ra loai file anh
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
-        cb(null, true)
+    if (
+        file.mimetype === "image/png" ||
+        file.mimetype === "image/jpeg" ||
+        file.mimetype === "image/jpg"
+    ) {
+        cb(null, true);
     } else {
-        cb(null, false)
+        cb(null, false);
     }
-}
+};
 
 app.use(express.urlencoded({ extended: false }));
-app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use(
+    multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use(
     session({
-        secret: 'my secret',
+        secret: "my secret",
         resave: false,
         saveUninitialized: false,
-        store: store
+        store: store,
     })
 );
 app.use(csrfProtection);
@@ -76,43 +80,43 @@ app.use((req, res, next) => {
         return next();
     }
     Staff.findById(req.session.staff._id)
-        .then(staff => {
+        .then((staff) => {
             if (!staff) {
                 return next();
             }
             req.staff = staff;
             next();
         })
-        .catch(err => {
-            next(new Error(err))
+        .catch((err) => {
+            next(new Error(err));
         });
 });
 
 app.use(staffRoutes);
-app.use(authRoutes)
+app.use(authRoutes);
 
 app.use(errorController.get404);
-app.get('/500', errorController.get500)
-    //Xu ly loi
+app.get("/500", errorController.get500);
+//Xu ly loi
 app.use((error, req, res, next) => {
-    res.status(500).render('500', {
-        pageTitle: 'Server error',
-        path: '/500',
-        isAuthenticated: req.session.isLoggedIn
+    res.status(500).render("500", {
+        pageTitle: "Server error",
+        path: "/500",
+        isAuthenticated: req.session.isLoggedIn,
     });
-})
+});
 
 mongoose
     .connect(MONGODB_URI)
-    .then(result => {
-        app.listen(process.env.PORT || 8080, '0.0.0.0', () => {
-            console.log('Server is running')
-        })
+    .then((result) => {
+        app.listen(process.env.PORT || 8080, "0.0.0.0", () => {
+            console.log("Server is running");
+        });
     })
-    .catch(err => console.log(err))
-    // mongoose
-    //     .connect(MONGODB_URI)
-    //     .then(result => {
-    //         app.listen(3000)
-    //     })
-    //     .catch(err => console.log(err))
+    .catch((err) => console.log(err));
+// mongoose
+//     .connect(MONGODB_URI)
+//     .then(result => {
+//         app.listen(3000)
+//     })
+//     .catch(err => console.log(err))
